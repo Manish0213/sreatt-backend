@@ -2,6 +2,7 @@ package com.sreatt.sreatt_backend.config;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -24,11 +25,13 @@ public class WebSecurityConfig {
 	
 	private static final String[] PUBLIC_ROUTES = {"/api/test/**", "/api/specifications/**", "/auth/**", "/swagger-ui/**", "/v3/api-docs/**", "/api/products/**", "/distributor/getAllDistributors"};
     private final JwtAuthFilter jwtAuthFilter;
+    
+    private final CorsConfigurationSource myCorsConfigurationSource;
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
-        		.cors(cors -> cors.configurationSource(corsConfigurationSource()))
+        		.cors(cors -> cors.configurationSource(myCorsConfigurationSource))
                 .sessionManagement(sessionConfig -> sessionConfig
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(csrfConfig -> csrfConfig.disable())
