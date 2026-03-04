@@ -9,6 +9,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.sreatt.sreatt_backend.dto.WarrantyListResponseDto;
@@ -311,6 +313,9 @@ public class WarrantyService {
 
 
 	public WarrantyResponse checkWarranty(String serialNo) {
+		
+		// 🔥 Step 1: Current logged-in user id nikalo
+	    Long userId = getCurrentUserId();
 
 		Product product = productRepository.findBySerialNo(serialNo)
 				.orElseThrow(() -> new WarrantyException(
@@ -320,12 +325,20 @@ public class WarrantyService {
                 ));
 		
 		// Find the warranty record for this product
-        Warranty warranty = warrantyRepository.findByProductSerialNo(serialNo)
-                .orElseThrow(() -> new WarrantyException(
-                        "NO_WARRANTY",
-                        "No warranty found for this product",
-                        HttpStatus.BAD_REQUEST
-                ));
+//        Warranty warranty = warrantyRepository.findByProductSerialNo(serialNo)
+//                .orElseThrow(() -> new WarrantyException(
+//                        "NO_WARRANTY",
+//                        "No warranty found for this product",
+//                        HttpStatus.BAD_REQUEST
+//                ));
+		
+		Warranty warranty = warrantyRepository
+	            .findByUser_IdAndProduct_SerialNo(userId, serialNo)
+	            .orElseThrow(() -> new WarrantyException(
+	                    "NO_WARRANTY",
+	                    "You have not registered warranty for this product",
+	                    HttpStatus.BAD_REQUEST
+	            ));
 
         LocalDate purchaseDate = warranty.getPurchaseDate();
 		Integer warrantyMonths = product.getWarrantyMonths();
@@ -362,5 +375,11 @@ public class WarrantyService {
 				remainingDays,
 				warranty.getStatus()
 				);
+	}
+	
+	private Long getCurrentUserId() {
+	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+	    User userDetails = (User) authentication.getPrincipal();
+	    return userDetails.getId();
 	}
 }

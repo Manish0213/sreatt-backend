@@ -47,4 +47,6 @@ public interface WarrantyRepository extends JpaRepository<Warranty, Long> {
     Optional<Warranty> findByProductSerialNo(String serialNo);
     
     boolean existsByProduct(Product product);
+    
+    Optional<Warranty> findByUser_IdAndProduct_SerialNo(Long userId, String serialNo);
 }

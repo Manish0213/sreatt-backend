@@ -32,6 +32,7 @@ public class WebSecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
         		.cors(cors -> cors.configurationSource(myCorsConfigurationSource))
+//        		.cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(sessionConfig -> sessionConfig
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(csrfConfig -> csrfConfig.disable())
